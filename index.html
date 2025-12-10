@@ -399,16 +399,11 @@
         r.style.setProperty('--text-off', getContrastColor(cOff));
 
         r.style.setProperty('--bg-special', cSpec);
-        // Special logic: if user picks white, allow red text. If dark, white text.
-        // But user previously wanted Red Text. 
-        // We will stick to the contrast rule: if dark BG -> White text. If Light BG -> Red Text (to keep the "Special" feel).
-        // Let's check luminance.
-        let specLum = getContrastColor(cSpec); // returns black or white
+        
+        let specLum = getContrastColor(cSpec);
         if (specLum === '#000000') {
-            // Light background -> Keep Red Text
             r.style.setProperty('--text-special', '#ff0000');
         } else {
-            // Dark background -> White Text
             r.style.setProperty('--text-special', '#ffffff');
         }
     }
@@ -425,7 +420,6 @@
         let val = document.getElementById('inStartDate').value;
         if (!val) return;
         let parts = val.split('-');
-        // Display as DD-MM-YYYY
         document.getElementById('visualDateDisplay').innerText = `${parts[2]}-${parts[1]}-${parts[0]}`;
         calculateAll();
     }
@@ -515,50 +509,56 @@
         }
     }
 
+    // --- REUSABLE YEAR GRID GENERATOR ---
+    function createMonthElement(year, month) {
+        let monthDate = new Date(year, month, 1);
+        let specials = getSpecialDates();
+
+        let block = document.createElement('div');
+        block.className = "month-block";
+        
+        let title = document.createElement('div');
+        title.className = "month-title";
+        title.innerText = monthDate.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'default', { month: 'long', year: 'numeric' });
+        block.appendChild(title);
+
+        let table = document.createElement('table');
+        table.className = "mini-table";
+        let trH = document.createElement('tr');
+        let miniD = currentLang === 'ar' ? ["ح","ن","ث","ر","خ","ج","س"] : ["S","M","T","W","T","F","S"];
+        miniD.forEach(d => {
+            let th = document.createElement('th'); th.innerText = d; th.className="mini-day-header"; trH.appendChild(th);
+        });
+        table.appendChild(trH);
+
+        let startDay = monthDate.getDay();
+        let daysInM = new Date(year, month+1, 0).getDate();
+        let tr = document.createElement('tr');
+        
+        for(let i=0; i<startDay; i++) tr.appendChild(document.createElement('td'));
+
+        for(let d=1; d<=daysInM; d++) {
+            if(tr.children.length === 7) { table.appendChild(tr); tr = document.createElement('tr'); }
+            let cellDate = new Date(year, month, d);
+            let td = document.createElement('td');
+            td.innerText = d;
+            applyColorLogic(td, cellDate, specials);
+            tr.appendChild(td);
+        }
+        while(tr.children.length > 0 && tr.children.length < 7) tr.appendChild(document.createElement('td'));
+        if(tr.children.length > 0) table.appendChild(tr);
+
+        block.appendChild(table);
+        return block;
+    }
+
     function updateYearView() {
         document.getElementById('yearDisplayLabel').innerText = `${currentViewYear} ${i18n[currentLang].yearOverview}`;
         let container = document.getElementById('yearGrid');
         container.innerHTML = "";
-        let specials = getSpecialDates();
-
+        
         for (let m = 0; m < 12; m++) {
-            let monthDate = new Date(currentViewYear, m, 1);
-            let block = document.createElement('div');
-            block.className = "month-block";
-            
-            let title = document.createElement('div');
-            title.className = "month-title";
-            title.innerText = monthDate.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'default', { month: 'long' });
-            block.appendChild(title);
-
-            let table = document.createElement('table');
-            table.className = "mini-table";
-            let trH = document.createElement('tr');
-            let miniD = currentLang === 'ar' ? ["ح","ن","ث","ر","خ","ج","س"] : ["S","M","T","W","T","F","S"];
-            miniD.forEach(d => {
-                let th = document.createElement('th'); th.innerText = d; th.className="mini-day-header"; trH.appendChild(th);
-            });
-            table.appendChild(trH);
-
-            let startDay = monthDate.getDay();
-            let daysInM = new Date(currentViewYear, m+1, 0).getDate();
-            let tr = document.createElement('tr');
-            
-            for(let i=0; i<startDay; i++) tr.appendChild(document.createElement('td'));
-
-            for(let d=1; d<=daysInM; d++) {
-                if(tr.children.length === 7) { table.appendChild(tr); tr = document.createElement('tr'); }
-                let cellDate = new Date(currentViewYear, m, d);
-                let td = document.createElement('td');
-                td.innerText = d;
-                applyColorLogic(td, cellDate, specials);
-                tr.appendChild(td);
-            }
-            while(tr.children.length > 0 && tr.children.length < 7) tr.appendChild(document.createElement('td'));
-            if(tr.children.length > 0) table.appendChild(tr);
-
-            block.appendChild(table);
-            container.appendChild(block);
+            container.appendChild(createMonthElement(currentViewYear, m));
         }
     }
 
@@ -642,9 +642,9 @@
         let temp = document.createElement('div');
         temp.style.width = '750px'; temp.style.background = 'white'; temp.style.padding = '20px';
         
-        // Use default font for PDF to avoid arabic issues in simple html2pdf usage without custom fonts
         temp.style.fontFamily = 'Arial, sans-serif';
 
+        // 1. CALENDAR VIEW
         let calClone = document.getElementById('section-calendar').cloneNode(true);
         calClone.style.flex = 'none'; calClone.style.width = '100%'; calClone.style.boxShadow='none';
         if (isShort) {
@@ -655,7 +655,30 @@
         }
         temp.appendChild(calClone);
 
-        if (!isShort) {
+        // 2. YEAR VIEW (CONDITIONAL)
+        if (isShort) {
+            // GENERATE 3 MONTHS ONLY
+            let summaryGrid = document.createElement('div');
+            summaryGrid.style.display = 'grid'; 
+            summaryGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            summaryGrid.style.gap = '10px';
+            summaryGrid.style.marginTop = '20px';
+
+            let val = document.getElementById('inStartDate').value;
+            let parts = val.split('-');
+            let startY = parseInt(parts[0]);
+            let startM = parseInt(parts[1]) - 1; 
+
+            for (let i = 0; i < 3; i++) {
+                // createMonthElement handles year rollover automatically
+                let block = createMonthElement(startY, startM + i);
+                block.style.width = 'auto'; 
+                block.style.fontSize = '10px';
+                summaryGrid.appendChild(block);
+            }
+            temp.appendChild(summaryGrid);
+        } else {
+            // FULL YEAR
             let yearClone = document.getElementById('section-yearview').cloneNode(true);
             yearClone.style.boxShadow='none'; yearClone.style.marginTop='20px';
             yearClone.querySelectorAll('button').forEach(b=>b.remove());
