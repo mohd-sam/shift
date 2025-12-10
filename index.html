@@ -11,13 +11,13 @@
         :root {
             /* Default Colors */
             --bg-off: #38761d;
-            --text-off: #ffffff; /* Calculated automatically */
+            --text-off: #ffffff; 
             
             --bg-on: #ffeb3b;
-            --text-on: #000000;  /* Calculated automatically */
+            --text-on: #000000;  
             
             --bg-special: #ffffff;
-            --text-special: #ff0000; /* Calculated automatically */
+            --text-special: #ff0000; 
 
             --header-gold: #ffd966;
             --header-grey: #e7e6e6;
@@ -95,6 +95,8 @@
             padding: 15px;
             border-radius: 4px;
             border: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
         }
 
         table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
@@ -107,33 +109,27 @@
         }
         input:focus { outline: 2px solid #217346; background: white; }
         
-        /* DATE INPUT HACK for DD-MM-YYYY format visual */
-        .date-container {
-            position: relative;
-            width: 100%;
+        /* STANDARD DATE PICKER STYLE */
+        .large-date-input {
+            width: 98%;
             height: 100%;
-        }
-        .date-display {
-            width: 100%;
-            height: 100%;
-            border: none;
-            text-align: center;
             font-size: 16px;
             font-weight: bold;
             color: #333;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .date-input-hidden {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0; /* Hidden but clickable */
             cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: center;
+        }
+
+        /* Specific input tweaks for iOS/Android NumPad */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .header-grey { background-color: var(--header-grey); font-weight: bold; }
@@ -179,6 +175,20 @@
         .set-btn {
             background-color: #217346; color: white; border: none;
             padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+        }
+
+        /* COUNTER STYLE */
+        .visit-counter {
+            margin-top: auto;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+        .counter-val {
+            font-weight: bold;
+            color: #217346;
         }
 
         .year-view-container {
@@ -247,7 +257,7 @@
                 <span id="lblInstr3">3. Adjust On/Off days below.</span>
             </div>
 
-            <!-- START DATE (VISUAL HACK FOR DD-MM-YYYY) -->
+            <!-- START DATE (REVERTED TO STANDARD INPUT) -->
             <table>
                 <tr><td colspan="4" class="header-grey" id="lblFirstWork">First Working Day</td></tr>
                 <tr>
@@ -255,13 +265,9 @@
                     <td class="header-gold" style="width:25%" id="lblWeekday">Weekday</td>
                 </tr>
                 <tr>
-                    <td colspan="3" style="padding:0; position:relative; height:35px;">
-                        <div class="date-container">
-                            <!-- Visual Display -->
-                            <div id="visualDateDisplay" class="date-display">DD-MM-YYYY</div>
-                            <!-- Hidden Picker -->
-                            <input type="date" id="inStartDate" class="date-input-hidden" onchange="handleDateChange()">
-                        </div>
+                    <td colspan="3" style="padding:0;">
+                        <!-- Reverted to standard date input for better UX -->
+                        <input type="date" id="inStartDate" class="large-date-input" onchange="calculateAll()">
                     </td>
                     <td class="calc-cell" id="outWeekday">...</td>
                 </tr>
@@ -304,7 +310,13 @@
             <div id="islamicHolidaysList">
                 <div class="loading-text">Loading...</div>
             </div>
-            <div id="holiday-footer" style="font-size:10px; color:#999; text-align:center; margin-top:10px;">*Estimated dates</div>
+            
+            <!-- VISIT COUNTER & FOOTER -->
+            <div class="visit-counter">
+                <span id="lblVisits">Your Visits:</span> 
+                <span class="counter-val" id="visitCountVal">0</span>
+            </div>
+            <div id="holiday-footer" style="font-size:10px; color:#999; text-align:center; margin-top:5px;">*Estimated dates</div>
         </div>
 
     </div>
@@ -330,7 +342,8 @@
             lblWeekday: "Weekday", lblSpec1: "Special Date 1", lblSpec2: "Special Date 2", lblSpec3: "Special Date 3",
             lblSpec4: "Special Date 4", lblThStart: "On Duty Start", lblThOn: "On Days", lblThOff: "Off Days",
             lblThEnd: "End Date", lblHolidaysTitle: "Islamic Holidays", days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], setBtn: "Set", yearOverview: "Yearly Overview"
+            daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], setBtn: "Set", yearOverview: "Yearly Overview",
+            lblVisits: "Your Visits:"
         },
         ar: {
             appTitle: "جدول الورديات", lblCalView: "عرض التقويم", btnExport: "تصدير ملخص 3 أشهر",
@@ -340,7 +353,8 @@
             lblWeekday: "اليوم", lblSpec1: "تاريخ خاص 1", lblSpec2: "تاريخ خاص 2", lblSpec3: "تاريخ خاص 3",
             lblSpec4: "تاريخ خاص 4", lblThStart: "بداية الدوام", lblThOn: "أيام العمل", lblThOff: "أيام الراحة",
             lblThEnd: "نهاية الدورة", lblHolidaysTitle: "المناسبات الإسلامية", days: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
-            daysShort: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"], setBtn: "تحديد", yearOverview: "نظرة سنوية"
+            daysShort: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"], setBtn: "تحديد", yearOverview: "نظرة سنوية",
+            lblVisits: "عدد زياراتك:"
         }
     };
 
@@ -356,9 +370,16 @@
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('inStartDate').value = `${yyyy}-${mm}-${dd}`;
-        handleDateChange(); // Updates visual display and calcs
+        
+        calculateAll();
         fetchIslamicHolidays(yyyy);
-        updateColors(); // Initialize contrast
+        updateColors(); 
+        
+        // VISIT COUNTER LOGIC
+        let visits = localStorage.getItem('shiftCalendarVisits') || 0;
+        visits++;
+        localStorage.setItem('shiftCalendarVisits', visits);
+        document.getElementById('visitCountVal').innerText = visits;
     }
 
     function toggleLanguage() {
@@ -376,13 +397,10 @@
 
     // --- CONTRAST & COLOR LOGIC ---
     function getContrastColor(hexColor) {
-        // Convert hex to RGB
         const r = parseInt(hexColor.substr(1, 2), 16);
         const g = parseInt(hexColor.substr(3, 2), 16);
         const b = parseInt(hexColor.substr(5, 2), 16);
-        // Calculate YIQ luminance
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-        // Returns black for light colors, white for dark colors
         return (yiq >= 128) ? '#000000' : '#ffffff';
     }
 
@@ -413,15 +431,6 @@
         document.getElementById('colOff').value = "#38761d";
         document.getElementById('colSpec').value = "#ffffff";
         updateColors();
-    }
-
-    // --- VISUAL DATE HANDLING ---
-    function handleDateChange() {
-        let val = document.getElementById('inStartDate').value;
-        if (!val) return;
-        let parts = val.split('-');
-        document.getElementById('visualDateDisplay').innerText = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        calculateAll();
     }
 
     // --- CALCULATION ---
@@ -690,6 +699,9 @@
             let holClone = document.getElementById('section-holidays').cloneNode(true);
             holClone.style.boxShadow='none'; holClone.style.border='none'; holClone.style.marginTop='20px';
             holClone.querySelectorAll('button').forEach(b=>b.remove());
+            // hide counter in PDF
+            let cnt = holClone.querySelector('.visit-counter');
+            if(cnt) cnt.remove();
             temp.appendChild(holClone);
         }
 
