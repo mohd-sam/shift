@@ -649,13 +649,15 @@
 
     function createPDF(isShort) {
         let temp = document.createElement('div');
-        temp.style.width = '750px'; temp.style.background = 'white'; temp.style.padding = '20px';
+        temp.style.width = '700px'; temp.style.background = 'white'; temp.style.padding = '20px';
         
         temp.style.fontFamily = 'Arial, sans-serif';
 
         // 1. CALENDAR VIEW
         let calClone = document.getElementById('section-calendar').cloneNode(true);
         calClone.style.flex = 'none'; calClone.style.width = '100%'; calClone.style.boxShadow='none';
+        calClone.style.marginBottom = '20px';
+        
         if (isShort) {
             let tbody = calClone.querySelector('tbody');
             while(tbody.children.length > 15) { tbody.removeChild(tbody.lastChild); }
@@ -668,9 +670,8 @@
         if (isShort) {
             // GENERATE 3 MONTHS ONLY
             let summaryGrid = document.createElement('div');
-            summaryGrid.style.display = 'grid'; 
-            summaryGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            summaryGrid.style.gap = '10px';
+            summaryGrid.style.display = 'flex'; 
+            summaryGrid.style.justifyContent = 'space-between';
             summaryGrid.style.marginTop = '20px';
 
             let val = document.getElementById('inStartDate').value;
@@ -681,19 +682,29 @@
             for (let i = 0; i < 3; i++) {
                 // createMonthElement handles year rollover automatically
                 let block = createMonthElement(startY, startM + i);
-                block.style.width = 'auto'; 
+                block.style.width = '32%'; 
                 block.style.fontSize = '10px';
                 summaryGrid.appendChild(block);
             }
             temp.appendChild(summaryGrid);
         } else {
-            // FULL YEAR
+            // FULL YEAR (Fixed Layout for PDF: Flex with wrapping)
             let yearClone = document.getElementById('section-yearview').cloneNode(true);
             yearClone.style.boxShadow='none'; yearClone.style.marginTop='20px';
             yearClone.querySelectorAll('button').forEach(b=>b.remove());
+            
+            // Re-style for PDF robustness (Avoid Grid in PDF)
             let grid = yearClone.querySelector('.year-grid');
-            grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            grid.querySelectorAll('.month-block').forEach(b=>{ b.style.width='auto'; b.style.fontSize='10px'; });
+            grid.style.display = 'flex'; 
+            grid.style.flexWrap = 'wrap'; 
+            grid.style.justifyContent = 'center';
+            grid.style.gap = '10px';
+            
+            grid.querySelectorAll('.month-block').forEach(b => { 
+                b.style.width = '30%'; // Forces 3 columns with some margin
+                b.style.fontSize = '10px'; 
+                b.style.margin = '5px';
+            });
             temp.appendChild(yearClone);
 
             let holClone = document.getElementById('section-holidays').cloneNode(true);
@@ -713,7 +724,8 @@
             margin: 0.2, filename: isShort ? 'Shift_Summary.pdf' : 'Full_Calendar.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: 'avoid-all' }
         };
 
         html2pdf().set(opt).from(temp).save().then(() => document.body.removeChild(overlay));
