@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Calendar</title>
+    
+    <!-- Google AdSense Main Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7127892355249348" crossorigin="anonymous"></script>
+
     <!-- PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         :root {
-            /* Default Colors */
+            /* Live Color Variables */
             --bg-off: #38761d;
             --text-off: #ffffff; 
             
@@ -19,22 +23,43 @@
             --bg-special: #ffffff;
             --text-special: #ff0000; 
 
-            --header-gold: #ffd966;
-            --header-grey: #e7e6e6;
-            --header-red: #ff6464;
-            --index-green: #38761d;
+            /* UI Colors */
+            --primary: #2c3e50;
+            --accent: #217346;
+            --bg-body: #f4f7f6;
+            --bg-card: #ffffff;
+            --border-soft: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
             
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --sidebar-bg: #f8f9fa;
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --radius: 8px;
         }
 
         body {
             font-family: var(--font-family);
-            background-color: #fcfcfc;
+            background-color: var(--bg-body);
+            color: #333;
             margin: 0;
-            padding: 10px;
+            padding: 15px;
             font-size: 14px;
         }
+
+        /* --- AD BANNER --- */
+        .ad-container {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            background: #e9ecef;
+            border: 1px dashed #adb5bd;
+            text-align: center;
+            padding: 10px;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .ad-placeholder-text { color: #6c757d; font-style: italic; font-weight: bold; }
 
         /* LAYOUT CONTAINER */
         .main-container {
@@ -43,285 +68,347 @@
             gap: 20px;
             max-width: 1400px;
             margin: 0 auto;
+            align-items: flex-start;
         }
         
         .top-bar {
             max-width: 1400px;
-            margin: 0 auto 10px auto;
+            margin: 0 auto 20px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
 
         .lang-btn {
-            background: #2c3e50;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .lang-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* --- CARDS & SECTIONS --- */
+        .section-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-soft);
         }
 
-        @media (max-width: 1024px) {
-            .main-container { flex-wrap: wrap; }
-            .sidebar-section { width: 100%; order: 3; }
+        .calendar-section { flex: 2; min-width: 340px; }
+        .controls-section { flex: 2; min-width: 320px; }
+        .sidebar-section { flex: 1; min-width: 250px; display: flex; flex-direction: column; }
+
+        /* --- MODERN CALENDAR STYLE --- */
+        #calTable {
+            width: 100%;
+            border-collapse: separate; 
+            border-spacing: 4px; 
+            margin-top: 10px;
         }
-
-        @media (max-width: 768px) {
-            .main-container { flex-direction: column; }
-            .controls-section { order: 1; }
-            .calendar-section { order: 2; }
-            .sidebar-section { order: 3; }
-        }
-
-        /* SECTIONS */
-        .calendar-section, .controls-section {
-            flex: 2;
-            min-width: 300px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        .controls-section { padding: 10px; }
-
-        .sidebar-section {
-            flex: 1;
-            min-width: 280px;
-            background: var(--sidebar-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-        }
-
-        table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
-        th, td { border: 1px solid #a0a0a0; padding: 4px 2px; text-align: center; height: 24px; }
-
-        input {
-            width: 90%; border: none; text-align: center;
-            font-family: var(--font-family); font-size: 14px;
-            background: rgba(255,255,255,0.5);
-        }
-        input:focus { outline: 2px solid #217346; background: white; }
         
-        /* STANDARD DATE PICKER STYLE */
-        .large-date-input {
-            width: 98%;
-            height: 100%;
-            font-size: 16px;
-            font-weight: bold;
+        .cal-header {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+            border: none !important;
+            background: transparent !important;
+            font-weight: 700;
+        }
+
+        #calBody td {
+            height: 45px;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.05);
+            font-weight: 500;
+            vertical-align: middle;
+            text-align: center;
+            transition: transform 0.1s;
+            white-space: nowrap; 
+            font-size: 13px;
+            padding: 2px;
+            overflow: hidden;
+        }
+        #calBody td:hover { transform: scale(1.02); }
+
+        /* Dynamic Colors */
+        .cell-off { background-color: var(--bg-off); color: var(--text-off); box-shadow: 0 2px 4px rgba(0,0,0,0.1); border:none !important;}
+        .cell-on { background-color: var(--bg-on); color: var(--text-on); box-shadow: 0 2px 4px rgba(0,0,0,0.1); border:none !important;}
+        .cell-special { 
+            background-color: var(--bg-special) !important; 
+            color: var(--text-special) !important; 
+            font-weight: 800;
+            border: 2px solid var(--text-special) !important;
+        }
+        .first-day-highlight { text-decoration: underline; font-size: 1.1em; }
+
+        /* --- CONTROLS FORM STYLE --- */
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .control-group:last-child { border-bottom: none; margin-bottom: 0; }
+        
+        .group-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+            font-size: 15px;
+        }
+
+        .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .input-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 120px; }
+        .input-wrapper label { font-size: 12px; color: #777; margin-bottom: 4px; font-weight: 600; }
+
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fdfdfd;
+            box-sizing: border-box;
+            font-family: var(--font-family);
             color: #333;
-            cursor: pointer;
-            border: none;
-            background: transparent;
             text-align: center;
         }
-
-        /* Specific input tweaks for iOS/Android NumPad */
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(33, 115, 70, 0.1);
         }
 
-        .header-grey { background-color: var(--header-grey); font-weight: bold; }
-        .header-gold { background-color: var(--header-gold); font-weight: bold; }
-        .header-red { background-color: var(--header-red); color: white; font-weight: bold; }
-        .index-green { background-color: var(--index-green); color: white; font-weight: bold; }
-        .calc-cell { background-color: #f3f3f3; color: #333; }
-        .cal-header { background-color: var(--header-grey); font-weight: bold; }
-
-        /* Dynamic Text Colors applied here */
-        .cell-off { background-color: var(--bg-off); color: var(--text-off); }
-        .cell-on { background-color: var(--bg-on); color: var(--text-on); }
-        .cell-special { background-color: var(--bg-special) !important; color: var(--text-special) !important; font-weight: bold; }
-
-        .first-day-highlight { font-weight: bold !important; text-decoration: underline; }
-
-        .color-settings {
-            display: flex; gap: 15px; margin-bottom: 15px; padding: 10px;
-            background: #f0f0f0; border-radius: 4px; align-items: center; justify-content: space-around;
-        }
-        .color-group { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: bold; }
-        input[type="color"] { width: 30px; height: 30px; padding: 0; border: 1px solid #ccc; cursor: pointer; }
-        .reset-colors-btn { font-size: 11px; padding: 5px; cursor: pointer; }
-
-        .export-btn {
-            display: block; width: 100%; padding: 12px; margin-bottom: 10px;
-            background-color: #d9534f; color: white; border: none; border-radius: 5px;
-            font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .export-btn:hover { background-color: #c9302c; }
+        #logicTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+        #logicTable thead tr { background: #f8f9fa; border-bottom: 2px solid #ddd; }
+        #logicTable th { padding: 10px 5px; color: #555; font-weight: 600; text-align: center; border: none; }
+        #logicTable tbody tr { border-bottom: 1px solid #eee; }
+        #logicTable td { padding: 8px 4px; border: none; text-align: center; }
+        #logicTable input { padding: 4px; width: 50px; border-radius: 4px; border: 1px solid #ccc; }
 
         .sidebar-title {
-            font-size: 16px; font-weight: bold; color: #2c3e50;
+            font-size: 16px; font-weight: 700; color: var(--primary);
             margin-bottom: 15px; text-align: center;
-            border-bottom: 2px solid #217346; padding-bottom: 5px; cursor: help;
+            padding-bottom: 10px; border-bottom: 2px solid var(--accent);
+            cursor: pointer;
         }
+        .sidebar-title:hover { color: var(--accent); }
 
         .holiday-card {
-            background: white; border-left: 4px solid #217346;
-            padding: 10px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center;
+            background: white; border-radius: 6px; padding: 12px; margin-bottom: 10px;
+            border: 1px solid #eee; border-left: 4px solid var(--accent);
+            display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s;
         }
+        .holiday-card:hover { transform: translateX(2px); }
+        
         .set-btn {
-            background-color: #217346; color: white; border: none;
-            padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
-        }
-
-        /* COUNTER STYLE */
-        .visit-counter {
-            margin-top: auto;
-            padding-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #ddd;
-        }
-        .counter-val {
-            font-weight: bold;
-            color: #217346;
+            background-color: var(--accent); color: white; border: none;
+            padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600;
         }
 
         .year-view-container {
-            max-width: 1400px; margin: 20px auto; background: white;
-            padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 4px;
+            max-width: 1400px; margin: 20px auto; padding: 20px; background: var(--bg-card);
+            border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-soft);
         }
-        .year-header-controls { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; font-size: 18px; font-weight: bold; }
-        .year-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
-        .month-block { width: 280px; border: 1px solid #ccc; padding: 5px; }
-        .month-title { text-align: center; font-weight: bold; background: var(--header-grey); padding: 3px; }
-        .mini-table { font-size: 11px; width: 100%; }
-        .mini-table td, .mini-table th { border: 1px solid #eee; height: 18px; padding: 0; }
-        .mini-day-header { background: #f0f0f0; }
+        .year-header-controls { 
+            display: flex; justify-content: center; gap: 20px; 
+            margin-bottom: 20px; font-size: 20px; font-weight: bold; color: var(--primary);
+        }
+        .year-header-controls button {
+            background: #f0f0f0; border: none; width: 30px; height: 30px; 
+            border-radius: 50%; cursor: pointer; font-weight: bold;
+        }
+        
+        .year-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        
+        .month-block { 
+            width: 300px; background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .month-title { 
+            text-align: center; font-weight: 700; background: #f8f9fa; padding: 8px; color: #555;
+            border-bottom: 1px solid #eee;
+        }
+        .mini-table { width: 100%; border-collapse: separate; border-spacing: 1px; padding: 5px; }
+        .mini-table th { color: #999; font-size: 10px; padding: 2px; }
+        .mini-table td { text-align: center; font-size: 11px; padding: 3px 0; border-radius: 3px; }
+
+        .export-btn {
+            display: block; width: 100%; padding: 14px; margin-bottom: 15px;
+            background-color: #e74c3c; color: white; border: none; border-radius: 6px;
+            font-size: 16px; font-weight: 600; cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2); transition: background 0.2s;
+        }
+        .export-btn:hover { background-color: #c0392b; }
+
+        .color-settings {
+            display: flex; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; 
+            justify-content: space-between; align-items: center;
+        }
+        .color-group { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; color: #666; }
+        input[type="color"] { 
+            width: 36px; height: 36px; border: none; border-radius: 50%; 
+            cursor: pointer; padding: 0; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .reset-colors-btn { font-size: 12px; color: #777; background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 15px; cursor: pointer; }
+
+        .instructions-box {
+            background: #e8f5e9; padding: 15px; border-radius: 6px; 
+            color: #2e7d32; font-size: 13px; margin-bottom: 15px; line-height: 1.6;
+        }
+
+        @media (max-width: 1024px) { .main-container { flex-wrap: wrap; } .sidebar-section { width: 100%; order: 3; } }
+        @media (max-width: 768px) { 
+            .main-container { flex-direction: column; } .controls-section { order: 1; } 
+            .calendar-section { order: 2; } .sidebar-section { order: 3; } 
+            #calBody td { font-size: 11px; height: 40px; padding: 1px; }
+        }
 
         body[dir="rtl"] { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body[dir="rtl"] .holiday-card { border-left: none; border-right: 4px solid #217346; }
+        body[dir="rtl"] .holiday-card { border-left: none; border-right: 4px solid var(--accent); }
         body[dir="rtl"] .set-btn { margin-left: 0; margin-right: 8px; }
 
     </style>
 </head>
 <body dir="ltr">
 
+    <!-- AD BANNER -->
+    <div class="ad-container">
+        <!-- 
+           ========== INSTRUCTIONS FOR ADS ============
+           The main AdSense script is already in the <head>.
+           To show a specific banner here:
+           1. Create a "Display Ad Unit" in your AdSense dashboard.
+           2. It will provide you with an <ins> tag and a small <script> call.
+           3. Paste that specific unit code below this comment.
+        -->
+        <span class="ad-placeholder-text">Ad Content Will Appear Here</span>
+    </div>
+
     <div class="top-bar">
-        <h2 style="margin:0" id="appTitle">Shift Calendar</h2>
+        <h2 style="margin:0; font-size: 24px;" id="appTitle">Shift Calendar</h2>
         <button class="lang-btn" onclick="toggleLanguage()">عربي / English</button>
     </div>
 
     <div class="main-container">
 
-        <!-- CALENDAR -->
-        <div class="calendar-section" id="section-calendar">
-            <div style="text-align:center; font-weight:bold; padding:5px; margin-bottom:5px;" id="lblCalView">Calendar View</div>
+        <!-- 1. CALENDAR SECTION -->
+        <div class="section-card calendar-section" id="section-calendar">
+            <div style="text-align:center; font-weight:700; font-size:18px; margin-bottom:15px; color:var(--primary);" id="lblCalView">Calendar View</div>
             <table id="calTable">
                 <thead><tr id="calHeaderRow"></tr></thead>
                 <tbody id="calBody"></tbody>
             </table>
         </div>
 
-        <!-- CONTROLS -->
-        <div class="controls-section">
+        <!-- 2. CONTROLS SECTION -->
+        <div class="section-card controls-section">
             
-            <button class="export-btn" onclick="generateShortPDF()" id="btnExport">Export 3-Month Summary</button>
+            <button class="export-btn" onclick="generateShortPDF()" id="btnExport">Export to PDF</button>
 
-            <!-- COLORS & CONTRAST -->
-            <div class="color-settings">
-                <div class="color-group">
-                    <span id="lblColorOn">On Duty</span>
-                    <input type="color" id="colOn" value="#ffeb3b" onchange="updateColors()">
+            <!-- Color Picker -->
+            <div class="control-group">
+                <div class="color-settings">
+                    <div class="color-group"><input type="color" id="colOn" value="#ffeb3b" onchange="updateColors()"><span id="lblColorOn">On Duty</span></div>
+                    <div class="color-group"><input type="color" id="colOff" value="#38761d" onchange="updateColors()"><span id="lblColorOff">Off Duty</span></div>
+                    <div class="color-group"><input type="color" id="colSpec" value="#ffffff" onchange="updateColors()"><span id="lblColorSpec">Special</span></div>
+                    <button class="reset-colors-btn" onclick="resetColors()" id="btnResetCol">Reset</button>
                 </div>
-                <div class="color-group">
-                    <span id="lblColorOff">Off Duty</span>
-                    <input type="color" id="colOff" value="#38761d" onchange="updateColors()">
-                </div>
-                <div class="color-group">
-                    <span id="lblColorSpec">Special</span>
-                    <input type="color" id="colSpec" value="#ffffff" onchange="updateColors()">
-                </div>
-                <button class="reset-colors-btn" onclick="resetColors()" id="btnResetCol">Reset</button>
             </div>
 
-            <!-- INSTRUCTIONS -->
-            <div class="instructions-box" style="background:#e8f5e9; padding:10px; border:1px solid green; margin-bottom:10px;">
+            <div class="instructions-box">
                 <strong id="lblInstrTitle">How to use:</strong><br>
                 <span id="lblInstr1">1. Select First Working Day.</span><br>
                 <span id="lblInstr2">2. Set Special Dates.</span><br>
                 <span id="lblInstr3">3. Adjust On/Off days below.</span>
             </div>
 
-            <!-- START DATE (REVERTED TO STANDARD INPUT) -->
-            <table>
-                <tr><td colspan="4" class="header-grey" id="lblFirstWork">First Working Day</td></tr>
-                <tr>
-                    <td colspan="3" class="header-gold" id="lblDateSel">Date Selection</td>
-                    <td class="header-gold" style="width:25%" id="lblWeekday">Weekday</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="padding:0;">
-                        <!-- Reverted to standard date input for better UX -->
-                        <input type="date" id="inStartDate" class="large-date-input" onchange="calculateAll()">
-                    </td>
-                    <td class="calc-cell" id="outWeekday">...</td>
-                </tr>
-            </table>
+            <!-- Start Date Control -->
+            <div class="control-group">
+                <span class="group-title" id="lblFirstWork">First Working Day</span>
+                <div class="input-row">
+                    <div class="input-wrapper">
+                        <label id="lblDateSel">Select Date</label>
+                        <input type="date" id="inStartDate" onchange="calculateAll()">
+                    </div>
+                    <div class="input-wrapper" style="flex: 0 0 100px;">
+                        <label id="lblWeekday">Weekday</label>
+                        <div id="outWeekday" style="padding:8px; background:#eee; border-radius:6px; text-align:center;">...</div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- SPECIAL DATES -->
-            <table>
-                <tr>
-                    <td class="header-red" id="lblSpec1">Special Date 1</td>
-                    <td><input type="date" id="spec1" onchange="calculateAll()"></td>
-                    <td class="header-red" id="lblSpec2">Special Date 2</td>
-                    <td><input type="date" id="spec2" onchange="calculateAll()"></td>
-                </tr>
-                <tr>
-                    <td class="header-red" id="lblSpec3">Special Date 3</td>
-                    <td><input type="date" id="spec3" onchange="calculateAll()"></td>
-                    <td class="header-red" id="lblSpec4">Special Date 4</td>
-                    <td><input type="date" id="spec4" onchange="calculateAll()"></td>
-                </tr>
-            </table>
+            <!-- Special Dates Control -->
+            <div class="control-group">
+                <span class="group-title">Special Dates</span>
+                <div class="input-row" style="margin-bottom: 10px;">
+                    <div class="input-wrapper">
+                        <label id="lblSpec1">Date 1</label>
+                        <input type="date" id="spec1" onchange="calculateAll()">
+                    </div>
+                    <div class="input-wrapper">
+                        <label id="lblSpec2">Date 2</label>
+                        <input type="date" id="spec2" onchange="calculateAll()">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-wrapper">
+                        <label id="lblSpec3">Date 3</label>
+                        <input type="date" id="spec3" onchange="calculateAll()">
+                    </div>
+                    <div class="input-wrapper">
+                        <label id="lblSpec4">Date 4</label>
+                        <input type="date" id="spec4" onchange="calculateAll()">
+                    </div>
+                </div>
+            </div>
 
-            <!-- LOGIC TABLE -->
-            <table id="logicTable">
-                <thead>
-                    <tr>
-                        <td class="index-green">#</td>
-                        <td class="header-gold" id="lblThStart">On Duty Start</td>
-                        <td class="header-gold" id="lblThOn">On Days</td>
-                        <td class="header-gold" id="lblThOff">Off Days</td>
-                        <td class="header-gold" id="lblThEnd">End Date</td>
-                    </tr>
-                </thead>
-                <tbody id="logicBody"></tbody>
-            </table>
+            <!-- Logic Table -->
+            <div class="control-group">
+                <span class="group-title">Shift Rotation</span>
+                <table id="logicTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th id="lblThStart">Start</th>
+                            <th id="lblThOn">On</th>
+                            <th id="lblThOff">Off</th>
+                            <th id="lblThEnd">End</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logicBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- SIDEBAR -->
-        <div class="sidebar-section" id="section-holidays">
+        <!-- 3. SIDEBAR (HOLIDAYS) -->
+        <div class="section-card sidebar-section" id="section-holidays">
             <div class="sidebar-title" onclick="generateFullPDF()" title="Click for Full PDF" id="lblHolidaysTitle">Islamic Holidays</div>
             <div id="islamicHolidaysList">
-                <div class="loading-text">Loading...</div>
+                <div class="loading-text" style="text-align:center; color:#999;">Loading...</div>
             </div>
             
-            <!-- VISIT COUNTER & FOOTER -->
             <div class="visit-counter">
-                <span id="lblVisits">Your Visits:</span> 
-                <span class="counter-val" id="visitCountVal">0</span>
+                <span id="lblVisits">Your Visits:</span> <span class="counter-val" id="visitCountVal">0</span>
             </div>
             <div id="holiday-footer" style="font-size:10px; color:#999; text-align:center; margin-top:5px;">*Estimated dates</div>
         </div>
 
     </div>
 
-    <!-- YEAR VIEW -->
+    <!-- 4. YEAR VIEW -->
     <div class="year-view-container" id="section-yearview">
         <div class="year-header-controls">
             <button onclick="changeYear(-1)">&lt;</button>
@@ -335,24 +422,24 @@
     // --- DICTIONARY ---
     const i18n = {
         en: {
-            appTitle: "Shift Calendar", lblCalView: "Calendar View", btnExport: "Export 3-Month Summary",
-            lblColorOn: "On Duty", lblColorOff: "Off Duty", lblColorSpec: "Special", btnResetCol: "Reset",
+            appTitle: "Shift Calendar", lblCalView: "Calendar View", btnExport: "Export to PDF",
+            lblColorOn: "On", lblColorOff: "Off", lblColorSpec: "Special", btnResetCol: "Reset",
             lblInstrTitle: "How to use:", lblInstr1: "1. Select First Working Day.", lblInstr2: "2. Set Special Dates.",
-            lblInstr3: "3. Adjust On/Off days below.", lblFirstWork: "First Working Day", lblDateSel: "Date Selection",
-            lblWeekday: "Weekday", lblSpec1: "Special Date 1", lblSpec2: "Special Date 2", lblSpec3: "Special Date 3",
-            lblSpec4: "Special Date 4", lblThStart: "On Duty Start", lblThOn: "On Days", lblThOff: "Off Days",
-            lblThEnd: "End Date", lblHolidaysTitle: "Islamic Holidays", days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            lblInstr3: "3. Adjust On/Off days below.", lblFirstWork: "First Working Day", lblDateSel: "Select Date",
+            lblWeekday: "Weekday", lblSpec1: "Date 1", lblSpec2: "Date 2", lblSpec3: "Date 3",
+            lblSpec4: "Date 4", lblThStart: "Start", lblThOn: "On", lblThOff: "Off",
+            lblThEnd: "End", lblHolidaysTitle: "Islamic Holidays", days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], setBtn: "Set", yearOverview: "Yearly Overview",
             lblVisits: "Your Visits:"
         },
         ar: {
-            appTitle: "جدول الورديات", lblCalView: "عرض التقويم", btnExport: "تصدير ملخص 3 أشهر",
-            lblColorOn: "دوام", lblColorOff: "راحة", lblColorSpec: "خاص", btnResetCol: "إعادة ضبط",
+            appTitle: "جدول الورديات", lblCalView: "عرض التقويم", btnExport: "تصدير PDF",
+            lblColorOn: "دوام", lblColorOff: "راحة", lblColorSpec: "خاص", btnResetCol: "إعادة",
             lblInstrTitle: "طريقة الاستخدام:", lblInstr1: "1. اختر تاريخ أول يوم عمل.", lblInstr2: "2. حدد التواريخ الخاصة.",
-            lblInstr3: "3. عدّل أيام العمل والراحة في الجدول.", lblFirstWork: "أول يوم عمل", lblDateSel: "تاريخ البداية",
-            lblWeekday: "اليوم", lblSpec1: "تاريخ خاص 1", lblSpec2: "تاريخ خاص 2", lblSpec3: "تاريخ خاص 3",
-            lblSpec4: "تاريخ خاص 4", lblThStart: "بداية الدوام", lblThOn: "أيام العمل", lblThOff: "أيام الراحة",
-            lblThEnd: "نهاية الدورة", lblHolidaysTitle: "المناسبات الإسلامية", days: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            lblInstr3: "3. عدّل أيام العمل والراحة.", lblFirstWork: "أول يوم عمل", lblDateSel: "اختر التاريخ",
+            lblWeekday: "اليوم", lblSpec1: "تاريخ 1", lblSpec2: "تاريخ 2", lblSpec3: "تاريخ 3",
+            lblSpec4: "تاريخ 4", lblThStart: "البداية", lblThOn: "عمل", lblThOff: "راحة",
+            lblThEnd: "النهاية", lblHolidaysTitle: "المناسبات الإسلامية", days: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
             daysShort: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"], setBtn: "تحديد", yearOverview: "نظرة سنوية",
             lblVisits: "عدد زياراتك:"
         }
@@ -360,9 +447,10 @@
 
     let currentLang = 'en';
     let rowsState = Array.from({length: 20}, () => ({ on: 14, off: 14 }));
-    let globalRotations = [];
     let currentViewYear = 2025;
     let nextSpecialSlot = 1;
+
+    let globalOnDutySet = new Set(); 
 
     function init() {
         const today = new Date();
@@ -375,7 +463,6 @@
         fetchIslamicHolidays(yyyy);
         updateColors(); 
         
-        // VISIT COUNTER LOGIC
         let visits = localStorage.getItem('shiftCalendarVisits') || 0;
         visits++;
         localStorage.setItem('shiftCalendarVisits', visits);
@@ -395,7 +482,6 @@
         fetchIslamicHolidays(yr);
     }
 
-    // --- CONTRAST & COLOR LOGIC ---
     function getContrastColor(hexColor) {
         const r = parseInt(hexColor.substr(1, 2), 16);
         const g = parseInt(hexColor.substr(3, 2), 16);
@@ -412,10 +498,8 @@
 
         r.style.setProperty('--bg-on', cOn);
         r.style.setProperty('--text-on', getContrastColor(cOn));
-
         r.style.setProperty('--bg-off', cOff);
         r.style.setProperty('--text-off', getContrastColor(cOff));
-
         r.style.setProperty('--bg-special', cSpec);
         
         let specLum = getContrastColor(cSpec);
@@ -433,7 +517,6 @@
         updateColors();
     }
 
-    // --- CALCULATION ---
     function calculateAll() {
         let dateVal = document.getElementById('inStartDate').value;
         if (!dateVal) return;
@@ -449,21 +532,29 @@
 
         let logicBody = document.getElementById('logicBody');
         logicBody.innerHTML = "";
-        globalRotations = [];
+        
+        globalOnDutySet.clear();
+        
         let currentStart = new Date(startDate);
 
         for (let i = 0; i < rowsState.length; i++) {
             let rowData = rowsState[i];
-            let workEnd = new Date(currentStart);
-            workEnd.setDate(currentStart.getDate() + rowData.on - 1);
-            let cycleEnd = new Date(currentStart);
-            cycleEnd.setDate(currentStart.getDate() + rowData.on + rowData.off - 1);
+            
+            let tempDate = new Date(currentStart);
+            for (let d = 0; d < rowData.on; d++) {
+                globalOnDutySet.add(toISODate(tempDate));
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
 
-            globalRotations.push({ start: new Date(currentStart), workEnd: new Date(workEnd) });
+            let workEnd = new Date(currentStart);
+            workEnd.setDate(workEnd.getDate() + rowData.on - 1);
+            
+            let cycleEnd = new Date(currentStart);
+            cycleEnd.setDate(cycleEnd.getDate() + rowData.on + rowData.off - 1);
 
             logicBody.innerHTML += `
                 <tr>
-                    <td class="index-green">${i + 1}</td>
+                    <td style="color:var(--accent); font-weight:bold;">${i + 1}</td>
                     <td>${formatDate(currentStart)}</td>
                     <td><input type="number" inputmode="numeric" value="${rowData.on}" onfocus="this.select()" onchange="updateTable(${i}, 'on', this.value)"></td>
                     <td><input type="number" inputmode="numeric" value="${rowData.off}" onfocus="this.select()" onchange="updateTable(${i}, 'off', this.value)"></td>
@@ -518,7 +609,6 @@
         }
     }
 
-    // --- REUSABLE YEAR GRID GENERATOR ---
     function createMonthElement(year, month) {
         let monthDate = new Date(year, month, 1);
         let specials = getSpecialDates();
@@ -575,14 +665,18 @@
 
     function applyColorLogic(el, date, specials) {
         let iso = toISODate(date);
-        let time = date.getTime();
-        if (specials.includes(iso)) { el.className = "cell-special"; return; }
+        el.style.boxShadow = ''; 
         
-        for(let rot of globalRotations) {
-            if (time >= rot.start.getTime() && time <= rot.workEnd.getTime()) {
-                el.className = "cell-on"; return;
-            }
+        if (specials.includes(iso)) { 
+            el.className = "cell-special"; 
+            return; 
         }
+        
+        if (globalOnDutySet.has(iso)) {
+            el.className = "cell-on";
+            return;
+        }
+
         el.className = "cell-off";
     }
 
@@ -620,7 +714,7 @@
                 list.innerHTML += `
                 <div class="holiday-card">
                     <div style="flex:1">
-                        <div style="font-weight:bold;color:#217346">${name}</div>
+                        <div style="font-weight:700;color:var(--accent);">${name}</div>
                         <div style="font-size:12px;color:#555">${h.dateStr}</div>
                     </div>
                     <button class="set-btn" onclick="setSpecial('${dIso}')">${i18n[currentLang].setBtn}</button>
@@ -651,12 +745,11 @@
         let temp = document.createElement('div');
         temp.style.width = '700px'; temp.style.background = 'white'; temp.style.padding = '20px';
         
-        temp.style.fontFamily = 'Arial, sans-serif';
+        temp.style.fontFamily = 'Segoe UI, Arial, sans-serif';
 
-        // 1. CALENDAR VIEW
         let calClone = document.getElementById('section-calendar').cloneNode(true);
         calClone.style.flex = 'none'; calClone.style.width = '100%'; calClone.style.boxShadow='none';
-        calClone.style.marginBottom = '20px';
+        calClone.style.marginBottom = '20px'; calClone.style.border='none';
         
         if (isShort) {
             let tbody = calClone.querySelector('tbody');
@@ -666,9 +759,7 @@
         }
         temp.appendChild(calClone);
 
-        // 2. YEAR VIEW (CONDITIONAL)
         if (isShort) {
-            // GENERATE 3 MONTHS ONLY
             let summaryGrid = document.createElement('div');
             summaryGrid.style.display = 'flex'; 
             summaryGrid.style.justifyContent = 'space-between';
@@ -680,20 +771,19 @@
             let startM = parseInt(parts[1]) - 1; 
 
             for (let i = 0; i < 3; i++) {
-                // createMonthElement handles year rollover automatically
                 let block = createMonthElement(startY, startM + i);
                 block.style.width = '32%'; 
                 block.style.fontSize = '10px';
+                block.style.boxShadow = 'none';
+                block.style.border = '1px solid #ddd';
                 summaryGrid.appendChild(block);
             }
             temp.appendChild(summaryGrid);
         } else {
-            // FULL YEAR (Fixed Layout for PDF: Flex with wrapping)
             let yearClone = document.getElementById('section-yearview').cloneNode(true);
-            yearClone.style.boxShadow='none'; yearClone.style.marginTop='20px';
+            yearClone.style.boxShadow='none'; yearClone.style.marginTop='20px'; yearClone.style.border='none';
             yearClone.querySelectorAll('button').forEach(b=>b.remove());
             
-            // Re-style for PDF robustness (Avoid Grid in PDF)
             let grid = yearClone.querySelector('.year-grid');
             grid.style.display = 'flex'; 
             grid.style.flexWrap = 'wrap'; 
@@ -701,16 +791,17 @@
             grid.style.gap = '10px';
             
             grid.querySelectorAll('.month-block').forEach(b => { 
-                b.style.width = '30%'; // Forces 3 columns with some margin
+                b.style.width = '30%'; 
                 b.style.fontSize = '10px'; 
                 b.style.margin = '5px';
+                b.style.boxShadow = 'none';
+                b.style.border = '1px solid #ddd';
             });
             temp.appendChild(yearClone);
 
             let holClone = document.getElementById('section-holidays').cloneNode(true);
             holClone.style.boxShadow='none'; holClone.style.border='none'; holClone.style.marginTop='20px';
             holClone.querySelectorAll('button').forEach(b=>b.remove());
-            // hide counter in PDF
             let cnt = holClone.querySelector('.visit-counter');
             if(cnt) cnt.remove();
             temp.appendChild(holClone);
