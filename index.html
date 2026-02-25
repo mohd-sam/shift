@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shift Calendar</title>
     
     <!-- PDF Library -->
@@ -10,7 +10,6 @@
     
     <style>
         :root {
-            /* Default: Palette 1 (Professional Blue & Grey) */
             --bg-off: #ecf0f1;
             --text-off: #2c3e50; 
             --bg-on: #2980b9;
@@ -29,7 +28,7 @@
             --radius: 12px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; touch-action: manipulation; }
 
         body {
             font-family: var(--font-family);
@@ -41,24 +40,23 @@
             line-height: 1.4;
         }
 
-        /* Main Grid: Prevents RTL overflow */
         .main-container {
             display: grid;
-            grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1.2fr);
-            gap: 20px;
-            max-width: 1450px;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr) minmax(0, 1.2fr);
+            gap: 15px;
+            max-width: 1500px;
             margin: 0 auto;
             align-items: flex-start;
         }
         
         .top-bar {
-            max-width: 1450px;
+            max-width: 1500px;
             margin: 0 auto 15px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--bg-card);
-            padding: 12px 20px;
+            padding: 10px 15px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
         }
@@ -67,16 +65,16 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
+            font-size: 13px;
         }
 
         .section-card {
             background: var(--bg-card);
-            padding: 20px;
+            padding: 15px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             border: 1px solid var(--border-soft);
@@ -87,37 +85,40 @@
         .table-responsive-wrapper {
             width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 10px;
             border-radius: 8px;
         }
 
         #calTable { 
             width: 100%; 
             border-collapse: separate; 
-            border-spacing: 4px; 
-            min-width: 450px; 
+            border-spacing: 3px; 
+            table-layout: fixed; 
         }
 
-        .cal-header { color: #95a5a6; font-size: 11px; text-transform: uppercase; padding-bottom: 8px; font-weight: 700; text-align: center;}
+        .cal-header { color: #95a5a6; font-size: 10px; text-transform: uppercase; padding-bottom: 6px; font-weight: 700; text-align: center;}
         
         #calBody td {
-            height: 48px;
-            border-radius: 10px;
-            border: 1px solid rgba(0,0,0,0.03);
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.02);
             font-weight: 600;
             vertical-align: middle;
             text-align: center;
-            transition: all 0.2s ease;
-            white-space: nowrap; 
-            font-size: 12px;
-            padding: 2px;
+            font-size: 10px;
+            padding: 1px;
             position: relative;
         }
 
+        /* High Contrast Month Start Indicators for Web View */
         .month-start {
-            border-top: 4px solid var(--accent) !important;
-            font-weight: 800 !important;
+            border-top: 5px solid #000 !important;
+            font-weight: 900 !important;
+        }
+        .cell-on.month-start {
+            border-top: 5px solid #fff !important;
+        }
+        .cell-special.month-start {
+            border-top: 5px solid #000 !important;
         }
 
         .cell-off { background-color: var(--bg-off); color: var(--text-off); }
@@ -129,103 +130,86 @@
             border: 2px solid var(--text-special) !important;
         }
 
-        .control-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; width: 100%; }
-        .group-title { font-weight: 700; color: var(--primary); margin-bottom: 12px; display: block; font-size: 14px; }
+        .control-group { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f2f2f2; width: 100%; }
+        .group-title { font-weight: 700; color: var(--primary); margin-bottom: 10px; display: block; font-size: 13px; }
         
         .palette-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
         .palette-btn {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            transition: 0.2s;
+            background: #fff; border: 1px solid #ddd; border-radius: 8px;
+            padding: 6px; cursor: pointer; display: flex; align-items: center;
+            gap: 6px; font-size: 10px; font-weight: 600; transition: 0.2s;
         }
-        .palette-btn:hover { border-color: var(--accent); background: #f9f9f9; }
-        .palette-preview {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            overflow: hidden;
-            border: 1px solid #eee;
-        }
+        .palette-preview { width: 16px; height: 16px; border-radius: 50%; display: flex; overflow: hidden; border: 1px solid #eee; }
         .p-on { width: 50%; height: 100%; }
         .p-off { width: 50%; height: 100%; }
 
-        .instructions-box {
-            background: #ebf5ee; padding: 15px; border-radius: 10px; 
-            color: #1e5631; font-size: 13px; margin-bottom: 15px; line-height: 1.6;
-            border-left: 4px solid var(--accent);
-        }
-
-        input[type="date"] {
+        input[type="date"], input[type="number"] {
             width: 100%; padding: 8px; border: 1px solid #e0e0e0; border-radius: 8px;
             font-size: 14px; background: #fafafa; text-align: center;
         }
 
-        #logicTable input[type="number"] { width: 45px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
-        #logicTable th, #logicTable td { padding: 8px 4px; text-align: center; font-size: 11px; white-space: nowrap; }
+        /* Rotation List styling matching image look */
+        #logicTable { border-spacing: 0; width: 100%; }
+        #logicTable thead tr { border-bottom: 1px solid #e0e0e0; }
+        #logicTable th { font-weight: 700; color: #2c3e50; padding: 12px 4px; font-size: 13px; text-align: center; }
+        #logicTable td { padding: 14px 4px; text-align: center; font-size: 12px; color: #333; }
+        
+        #logicTable input[type="number"] { 
+            width: 55px; 
+            padding: 6px; 
+            border-radius: 6px; 
+            border: 1px solid #dcdde1; 
+            text-align: center;
+            font-family: inherit;
+            font-weight: 600;
+        }
 
         .export-btn {
-            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            display: block; width: 100%; padding: 12px; margin-bottom: 12px;
             background-color: #e74c3c; color: white; border: none; border-radius: 10px;
-            font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+            font-size: 14px; font-weight: 700; cursor: pointer;
         }
 
-        .sidebar-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; text-align: center; cursor: pointer; }
-        
-        .holiday-card { 
-            background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; 
-            border: 1px solid #f0f0f0; border-left: 4px solid var(--accent); 
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px;
+        .sidebar-title { 
+            font-size: 14px; 
+            font-weight: 700; 
+            border-bottom: 2px solid var(--accent); 
+            padding-bottom: 8px; 
+            margin-bottom: 12px; 
+            text-align: center; 
+            color: var(--primary);
+            cursor: pointer;
+            transition: color 0.2s;
         }
-        .holiday-card.user-date { border-left-color: #ff0000; background: #fffcfc; border-left-width: 6px; }
-        .holiday-date { color: var(--accent); font-weight: 700; font-size: 11px; }
+        .sidebar-title:hover { color: var(--accent); }
+
+        .holiday-card { 
+            background: white; border-radius: 10px; padding: 10px; margin-bottom: 8px; 
+            border-left: 4px solid var(--accent); display: flex;
+            justify-content: space-between; align-items: center; font-size: 12px;
+        }
+        .holiday-card.user-date { border-left-color: #ff0000; background: #fffcfc; }
+        .holiday-date { color: var(--accent); font-weight: 700; font-size: 10px; }
 
         .toggle-spec-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 26px;
-            height: 26px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            font-size: 18px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--accent); color: white; border: none; border-radius: 50%;
+            width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 16px; transition: 0.2s;
         }
-        .toggle-spec-btn.remove-mode {
-            background: #e67e22; /* Warning/Remove color */
-        }
-        .toggle-spec-btn:hover { transform: scale(1.1); }
+        .toggle-spec-btn.remove-mode { background: #e67e22; }
 
-        .year-view-container { max-width: 1450px; margin: 20px auto; padding: 25px; background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border-soft); }
-        .year-header-controls { display: flex; justify-content: center; gap: 20px; margin-bottom: 25px; font-size: 22px; font-weight: 800; }
-        .year-header-controls button { background: #f0f0f0; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; }
-        .year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .month-block { background: white; border-radius: 12px; border: 1px solid #eee; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .month-title { text-align: center; font-weight: 700; background: #fafafa; padding: 10px; border-bottom: 1px solid #eee; }
-        .mini-table { width: 100%; border-collapse: separate; border-spacing: 2px; padding: 8px; }
-        .mini-table th { color: #bdc3c7; font-size: 9px; font-weight: 800; text-transform: uppercase; }
-        .mini-table td { text-align: center; font-size: 11px; padding: 4px 0; border-radius: 5px; font-weight: 600; }
+        .year-view-container { max-width: 1500px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; }
+        .year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        .month-block { background: white; border-radius: 10px; border: 1px solid #eee; overflow: hidden; }
+        .mini-table { width: 100%; border-collapse: separate; border-spacing: 1px; padding: 5px; }
+        .mini-table td { font-size: 10px; text-align: center; padding: 3px 0; border-radius: 4px; font-weight: 600; }
 
-        @media (max-width: 1100px) { 
+        @media (max-width: 1024px) { 
             .main-container { grid-template-columns: 1fr 1fr; } 
             .sidebar-section { grid-column: span 2; }
         }
@@ -233,10 +217,9 @@
             .main-container { grid-template-columns: 1fr; }
             .sidebar-section { grid-column: span 1; }
             .controls-section { order: -1; }
+            #calBody td { font-size: 9px; height: 38px; }
         }
 
-        /* Arabic Support */
-        [dir="rtl"] .instructions-box { border-left: 0; border-right: 4px solid var(--accent); }
         [dir="rtl"] .holiday-card { border-left: 0; border-right: 4px solid var(--accent); }
         [dir="rtl"] .holiday-card.user-date { border-right-color: #ff0000; }
     </style>
@@ -244,14 +227,14 @@
 <body dir="ltr">
 
     <div class="top-bar">
-        <h2 style="margin:0; font-weight: 800;" id="appTitle">Shift Calendar</h2>
+        <h2 style="margin:0; font-size: 1.1rem; font-weight: 800;" id="appTitle">Shift Calendar</h2>
         <button class="lang-btn" onclick="toggleLanguage()">عربي / English</button>
     </div>
 
     <div class="main-container">
         <!-- 1. CALENDAR VIEW -->
         <div class="section-card calendar-section">
-            <div style="text-align:center; font-weight:800; font-size:16px; margin-bottom:20px; color:var(--primary); text-transform: uppercase;" id="lblCalView">Calendar View</div>
+            <div style="text-align:center; font-weight:800; font-size:14px; margin-bottom:15px; color:var(--primary); text-transform: uppercase;" id="lblCalView">Calendar View</div>
             <div class="table-responsive-wrapper">
                 <table id="calTable">
                     <thead><tr id="calHeaderRow"></tr></thead>
@@ -267,38 +250,17 @@
             <div class="control-group">
                 <span class="group-title" id="lblPalettes">Color Palettes</span>
                 <div class="palette-container">
-                    <button class="palette-btn" onclick="applyPalette('#2980b9', '#ecf0f1')">
-                        <div class="palette-preview"><div class="p-on" style="background:#2980b9"></div><div class="p-off" style="background:#ecf0f1"></div></div>
-                        <span id="p1">Professional</span>
-                    </button>
-                    <button class="palette-btn" onclick="applyPalette('#2c3e50', '#1abc9c')">
-                        <div class="palette-preview"><div class="p-on" style="background:#2c3e50"></div><div class="p-off" style="background:#1abc9c"></div></div>
-                        <span id="p2">Deep Contrast</span>
-                    </button>
-                    <button class="palette-btn" onclick="applyPalette('#e67e22', '#34495e')">
-                        <div class="palette-preview"><div class="p-on" style="background:#e67e22"></div><div class="p-off" style="background:#34495e"></div></div>
-                        <span id="p3">Energy</span>
-                    </button>
-                    <!-- REVERSED MINIMALIST PALETTE -->
-                    <button class="palette-btn" onclick="applyPalette('#f3e5ab', '#16a085')">
-                        <div class="palette-preview"><div class="p-on" style="background:#f3e5ab"></div><div class="p-off" style="background:#16a085"></div></div>
-                        <span id="p4">Minimalist</span>
-                    </button>
+                    <button class="palette-btn" onclick="applyPalette('#2980b9', '#ecf0f1')"><div class="palette-preview"><div class="p-on" style="background:#2980b9"></div><div class="p-off" style="background:#ecf0f1"></div></div><span>P1</span></button>
+                    <button class="palette-btn" onclick="applyPalette('#2c3e50', '#1abc9c')"><div class="palette-preview"><div class="p-on" style="background:#2c3e50"></div><div class="p-off" style="background:#1abc9c"></div></div><span>P2</span></button>
+                    <button class="palette-btn" onclick="applyPalette('#e67e22', '#34495e')"><div class="palette-preview"><div class="p-on" style="background:#e67e22"></div><div class="p-off" style="background:#34495e"></div></div><span>P3</span></button>
+                    <button class="palette-btn" onclick="applyPalette('#f3e5ab', '#16a085')"><div class="palette-preview"><div class="p-on" style="background:#f3e5ab"></div><div class="p-off" style="background:#16a085"></div></div><span>P4</span></button>
                 </div>
                 
-                <div class="color-settings" style="display:flex; justify-content: space-around; background:#f9f9f9; padding:10px; border-radius:10px;">
+                <div class="color-settings" style="display:flex; justify-content: space-around; background:#f9f9f9; padding:8px; border-radius:10px;">
                     <div style="display:flex; flex-direction:column; align-items:center;"><input type="color" id="colOn" value="#2980b9" onchange="updateColors()">On</div>
                     <div style="display:flex; flex-direction:column; align-items:center;"><input type="color" id="colOff" value="#ecf0f1" onchange="updateColors()">Off</div>
                     <div style="display:flex; flex-direction:column; align-items:center;"><input type="color" id="colSpec" value="#ffffff" onchange="updateColors()">Spec</div>
-                    <button onclick="resetColors()" style="border:1px solid #ddd; border-radius:20px; padding:5px 10px; cursor:pointer; font-size:11px;">Reset</button>
                 </div>
-            </div>
-
-            <div class="instructions-box">
-                <strong id="lblInstrTitle">Setup Guide:</strong><br>
-                <span id="lblInstr1">1. Pick your first work day.</span><br>
-                <span id="lblInstr2">2. Add holidays or special dates.</span><br>
-                <span id="lblInstr3">3. Customize your shift cycle below.</span>
             </div>
 
             <div class="control-group">
@@ -307,8 +269,8 @@
             </div>
             
             <div class="control-group">
-                <span class="group-title">Special Highlighting</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <span class="group-title">Special Highlight</span>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                     <input type="date" id="spec1" onchange="calculateAll()">
                     <input type="date" id="spec2" onchange="calculateAll()">
                     <input type="date" id="spec3" onchange="calculateAll()">
@@ -317,10 +279,10 @@
             </div>
             
             <div class="control-group">
-                <span class="group-title">Rotation List</span>
+                <span class="group-title" id="lblRotationListTitle">Rotation List</span>
                 <div class="table-responsive-wrapper">
-                    <table id="logicTable" style="width: 100%; border-collapse: collapse;">
-                        <thead><tr style="border-bottom: 2px solid #eee;"><th>#</th><th>Start</th><th>On</th><th>Off</th><th>End</th></tr></thead>
+                    <table id="logicTable">
+                        <thead><tr><th>#</th><th>Start</th><th>On</th><th>Off</th><th>End</th></tr></thead>
                         <tbody id="logicBody"></tbody>
                     </table>
                 </div>
@@ -329,39 +291,27 @@
 
         <!-- 3. SIDEBAR (Holidays) -->
         <div class="section-card sidebar-section" id="section-holidays">
-            <div class="sidebar-title" onclick="generateFullPDF()" id="lblHolidaysTitle">Islamic Holidays</div>
+            <div class="sidebar-title" onclick="generateFullYearPDF()" id="lblHolidaysTitle">Islamic Holidays</div>
             <div id="islamicHolidaysList"></div>
-            <div class="visit-counter" style="margin-top:auto; border-top:1px solid #eee; padding-top:10px; text-align:center;">
-                Visits: <span class="counter-val" id="visitCountVal">0</span>
-            </div>
         </div>
     </div>
 
-    <!-- 4. YEAR OVERVIEW -->
-    <div class="year-view-container" id="section-yearview">
-        <div class="year-header-controls">
-            <button onclick="changeYear(-1)">&lsaquo;</button>
-            <span id="yearDisplayLabel">2025 Overview</span>
-            <button onclick="changeYear(1)">&rsaquo;</button>
+    <div class="year-view-container">
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; font-size: 20px; font-weight: 800;">
+            <button onclick="changeYear(-1)" style="border:none;background:none;cursor:pointer;">&lsaquo;</button>
+            <span id="yearDisplayLabel">2025</span>
+            <button onclick="changeYear(1)" style="border:none;background:none;cursor:pointer;">&rsaquo;</button>
         </div>
         <div class="year-grid" id="yearGrid"></div>
     </div>
 
 <script>
     const i18n = {
-        en: { 
-            appTitle: "Shift Calendar", lblCalView: "Calendar View", btnExport: "Export PDF", lblHolidaysTitle: "Islamic Holidays", daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-            lblInstrTitle: "Setup Guide:", lblInstr1: "1. Pick your first work day.", lblInstr2: "2. Add holidays or special dates.", lblInstr3: "3. Customize your shift cycle below.",
-            h_ramadan: "Ramadan Start", h_fitr: "Eid al-Fitr", h_arafat: "Arafat Day", h_adha: "Eid al-Adha", h_hijri: "Islamic New Year", h_ashura: "Ashura", h_mawlid: "Prophet Birthday",
-            loading: "Loading holidays...", error: "Offline mode: Estimated holidays shown.", lblPalettes: "Color Palettes", p1: "Professional", p2: "Deep Contrast", p3: "Energy", p4: "Minimalist", userDate: "Special Highlight"
-        },
-        ar: { 
-            appTitle: "جدول الورديات", lblCalView: "عرض التقويم", btnExport: "تصدير PDF", lblHolidaysTitle: "المناسبات الإسلامية", daysShort: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"],
-            lblInstrTitle: "دليل الإعداد:", lblInstr1: "1. اختر تاريخ أول يوم عمل.", lblInstr2: "2. أضف المناسبات الخاصة.", lblInstr3: "3. عدّل نظام المناوبات أدناه.",
-            h_ramadan: "بداية رمضان", h_fitr: "عيد الفطر", h_arafat: "يوم عرفة", h_adha: "عيد الأضحى", h_hijri: "رأس السنة الهجرية", h_ashura: "عاشوراء", h_mawlid: "المولد النبوي",
-            loading: "جاري التحميل...", error: "وضع عدم الاتصال: عرض التواريخ التقديرية.", lblPalettes: "مجموعات الألوان", p1: "المهني", p2: "تباين عميق", p3: "نشيط", p4: "بسيط", userDate: "تحديد خاص"
-        }
+        en: { appTitle: "Shift Calendar", lblCalView: "Calendar View", btnExport: "Export PDF", lblHolidaysTitle: "Islamic Holidays", lblRotationListTitle: "Rotation List", daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], h_ramadan: "Ramadan Start", h_fitr: "Eid al-Fitr", h_arafat: "Arafat Day", h_adha: "Eid al-Adha", h_hijri: "Islamic New Year", h_ashura: "Ashura", h_mawlid: "Prophet Birthday", userDate: "Special Highlight" },
+        ar: { appTitle: "جدول الورديات", lblCalView: "عرض التقويم", btnExport: "تصدير PDF", lblHolidaysTitle: "المناسبات الإسلامية", lblRotationListTitle: "Rotation List", daysShort: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"], h_ramadan: "بداية رمضان", h_fitr: "عيد الفطر", h_arafat: "يوم عرفة", h_adha: "عيد الأضحى", h_hijri: "رأس السنة الهجرية", h_ashura: "عاشوراء", h_mawlid: "المولد النبوي", userDate: "تحديد خاص" }
     };
+
+    const arFullMonths = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
     const staticHolidayFallback = {
         2024: [{ id: 'h_ramadan', d: '2024-03-11' }, { id: 'h_fitr', d: '2024-04-10' }, { id: 'h_arafat', d: '2024-06-15' }, { id: 'h_adha', d: '2024-06-16' }, { id: 'h_hijri', d: '2024-07-07' }, { id: 'h_ashura', d: '2024-07-16' }, { id: 'h_mawlid', d: '2024-09-15' }],
@@ -372,7 +322,7 @@
     const holidayNamesMap = { "1-1": "h_hijri", "10-1": "h_ashura", "12-3": "h_mawlid", "1-9": "h_ramadan", "1-10": "h_fitr", "9-12": "h_arafat", "10-12": "h_adha" };
 
     let currentLang = 'en';
-    let rowsState = Array.from({length: 20}, () => ({ on: 14, off: 14 }));
+    let rowsState = Array.from({length: 12}, () => ({ on: 14, off: 14 }));
     let currentViewYear = new Date().getFullYear();
     let globalOnDutySet = new Set(); 
     let cachedHolidays = {};
@@ -397,27 +347,23 @@
             document.getElementById('spec3').value = data.specials[2] || "";
             document.getElementById('spec4').value = data.specials[3] || "";
             if (data.colors) {
-                document.getElementById('colOn').value = data.colors.on || "#2980b9";
-                document.getElementById('colOff').value = data.colors.off || "#ecf0f1";
+                document.getElementById('colOn').value = data.colors.on;
+                document.getElementById('colOff').value = data.colors.off;
                 document.getElementById('colSpec').value = data.colors.spec || "#ffffff";
             }
-            rowsState = data.rowsState || Array.from({length: 20}, () => ({ on: 14, off: 14 }));
+            rowsState = data.rowsState || Array.from({length: 12}, () => ({ on: 14, off: 14 }));
             currentLang = data.lang || 'en';
         }
     }
 
     function init() {
         loadData();
-        const startVal = document.getElementById('inStartDate').value;
-        if (!startVal) document.getElementById('inStartDate').value = new Date().toISOString().split('T')[0];
+        if (!document.getElementById('inStartDate').value) document.getElementById('inStartDate').value = new Date().toISOString().split('T')[0];
         document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
         updateUIText();
         calculateAll();
         loadIslamicHolidays(new Date(document.getElementById('inStartDate').value).getFullYear());
         updateColors(); 
-        const visits = parseInt(localStorage.getItem('shiftCalendarVisits') || 0) + 1;
-        document.getElementById('visitCountVal').innerText = visits;
-        localStorage.setItem('shiftCalendarVisits', visits);
     }
 
     function updateUIText() {
@@ -425,15 +371,7 @@
         document.getElementById('btnExport').innerText = i18n[currentLang].btnExport;
         document.getElementById('lblHolidaysTitle').innerText = i18n[currentLang].lblHolidaysTitle;
         document.getElementById('lblCalView').innerText = i18n[currentLang].lblCalView;
-        document.getElementById('lblInstrTitle').innerText = i18n[currentLang].lblInstrTitle;
-        document.getElementById('lblInstr1').innerText = i18n[currentLang].lblInstr1;
-        document.getElementById('lblInstr2').innerText = i18n[currentLang].lblInstr2;
-        document.getElementById('lblInstr3').innerText = i18n[currentLang].lblInstr3;
-        document.getElementById('lblPalettes').innerText = i18n[currentLang].lblPalettes;
-        document.getElementById('p1').innerText = i18n[currentLang].p1;
-        document.getElementById('p2').innerText = i18n[currentLang].p2;
-        document.getElementById('p3').innerText = i18n[currentLang].p3;
-        document.getElementById('p4').innerText = i18n[currentLang].p4;
+        document.getElementById('lblRotationListTitle').innerText = i18n[currentLang].lblRotationListTitle;
     }
 
     function toggleLanguage() {
@@ -458,17 +396,15 @@
 
     function updateColors() {
         const r = document.querySelector(':root'), cOn = document.getElementById('colOn').value, cOff = document.getElementById('colOff').value, cSpec = document.getElementById('colSpec').value;
-        r.style.setProperty('--bg-on', cOn); r.style.setProperty('--text-on', getContrastColor(cOn));
-        r.style.setProperty('--bg-off', cOff); r.style.setProperty('--text-off', getContrastColor(cOff));
-        r.style.setProperty('--bg-special', cSpec); r.style.setProperty('--text-special', getContrastColor(cSpec) === '#000000' ? '#ff0000' : '#ffffff');
+        r.style.setProperty('--bg-on', cOn);
+        r.style.setProperty('--text-on', getContrastColor(cOn));
+        r.style.setProperty('--bg-off', cOff);
+        r.style.setProperty('--text-off', getContrastColor(cOff));
+        r.style.setProperty('--bg-special', cSpec);
+        const isBgLight = getContrastColor(cSpec) === '#000000';
+        r.style.setProperty('--text-special', isBgLight ? '#ff0000' : '#ffffff');
         r.style.setProperty('--accent', cOn);
         saveData();
-    }
-
-    function resetColors() { 
-        applyPalette('#2980b9', '#ecf0f1');
-        document.getElementById('colSpec').value = "#ffffff";
-        updateColors(); 
     }
 
     function toISODate(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -489,7 +425,16 @@
             }
             let cycleEnd = new Date(currentStart);
             cycleEnd.setDate(cycleEnd.getDate() + rowsState[i].on + rowsState[i].off - 1);
-            bodyHTML += `<tr><td>${i+1}</td><td style="font-size:10px;">${currentStart.toLocaleDateString()}</td><td><input type="number" value="${rowsState[i].on}" onchange="updateTable(${i}, 'on', this.value)"></td><td><input type="number" value="${rowsState[i].off}" onchange="updateTable(${i}, 'off', this.value)"></td><td style="font-size:10px;">${cycleEnd.toLocaleDateString()}</td></tr>`;
+            
+            const inputAttrs = `type="number" inputmode="numeric" pattern="[0-9]*" onfocus="this.select()"`;
+            
+            bodyHTML += `<tr>
+                <td>${i+1}</td>
+                <td>${currentStart.getMonth() + 1}/${currentStart.getDate()}/${currentStart.getFullYear()}</td>
+                <td><input ${inputAttrs} value="${rowsState[i].on}" onchange="updateTable(${i}, 'on', this.value)"></td>
+                <td><input ${inputAttrs} value="${rowsState[i].off}" onchange="updateTable(${i}, 'off', this.value)"></td>
+                <td>${cycleEnd.getMonth() + 1}/${cycleEnd.getDate()}/${cycleEnd.getFullYear()}</td>
+            </tr>`;
             currentStart = new Date(cycleEnd); currentStart.setDate(currentStart.getDate() + 1);
         }
         document.getElementById('logicBody').innerHTML = bodyHTML;
@@ -513,12 +458,13 @@
         for (let i = 0; i < 7; i++) thead += `<td class="cal-header">${daysList[(startIdx + i) % 7]}</td>`;
         document.getElementById('calHeaderRow').innerHTML = thead;
         let tbody = "", gridDate = new Date(firstDate), specials = [document.getElementById('spec1').value, document.getElementById('spec2').value, document.getElementById('spec3').value, document.getElementById('spec4').value];
-        for (let r = 0; r < 40; r++) {
+        for (let r = 0; r < 35; r++) {
             tbody += "<tr>";
             for (let c = 0; c < 7; c++) {
                 let iso = toISODate(gridDate), cls = specials.includes(iso) ? "cell-special" : (globalOnDutySet.has(iso) ? "cell-on" : "cell-off");
                 if (gridDate.getDate() === 1) cls += " month-start";
-                tbody += `<td class="${cls}">${gridDate.getDate()}-${gridDate.toLocaleString(currentLang==='ar'?'ar-EG':'default',{month:'short'})}</td>`;
+                let monthLabel = (currentLang === 'ar') ? (gridDate.getMonth() + 1) : gridDate.toLocaleString('default',{month:'short'});
+                tbody += `<td class="${cls}">${gridDate.getDate()}-${monthLabel}</td>`;
                 gridDate.setDate(gridDate.getDate() + 1);
             }
             tbody += "</tr>";
@@ -529,29 +475,12 @@
 
     function toggleSpecialDate(dateStr) {
         const slots = ['spec1', 'spec2', 'spec3', 'spec4'];
-        let foundIdx = -1;
-        for (let i = 0; i < slots.length; i++) {
-            if (document.getElementById(slots[i]).value === dateStr) {
-                foundIdx = i;
-                break;
-            }
-        }
-
-        if (foundIdx !== -1) {
-            // Remove it
-            document.getElementById(slots[foundIdx]).value = "";
-        } else {
-            // Add it to first empty slot
-            let added = false;
-            for (let id of slots) {
-                if (!document.getElementById(id).value) {
-                    document.getElementById(id).value = dateStr;
-                    added = true;
-                    break;
-                }
-            }
-            // Fallback: overwrite last slot if all full
-            if (!added) document.getElementById('spec4').value = dateStr;
+        let foundIdx = slots.findIndex(id => document.getElementById(id).value === dateStr);
+        if (foundIdx !== -1) { document.getElementById(slots[foundIdx]).value = ""; }
+        else {
+            let emptyIdx = slots.findIndex(id => !document.getElementById(id).value);
+            if (emptyIdx !== -1) document.getElementById(slots[emptyIdx]).value = dateStr;
+            else document.getElementById('spec4').value = dateStr;
         }
         calculateAll();
     }
@@ -579,7 +508,7 @@
 
     function updateYearView() {
         const container = document.getElementById('yearGrid'); container.innerHTML = "";
-        document.getElementById('yearDisplayLabel').innerText = currentViewYear + " Overview";
+        document.getElementById('yearDisplayLabel').innerText = currentViewYear;
         for (let m = 0; m < 12; m++) container.appendChild(createMonthElement(currentViewYear, m));
     }
 
@@ -587,7 +516,7 @@
     
     async function loadIslamicHolidays(year) {
         const list = document.getElementById('islamicHolidaysList');
-        list.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-size:12px;">${i18n[currentLang].loading}</div>`;
+        list.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-size:12px;">Loading...</div>`;
         if (cachedHolidays[year]) { renderHolidayList(cachedHolidays[year]); return; }
         try {
             const response = await fetch(`https://api.aladhan.com/v1/gregorianCalendarByYear/${year}`);
@@ -613,86 +542,97 @@
             } else { throw new Error(); }
         } catch (e) {
             const fallback = staticHolidayFallback[year];
-            if (fallback) { cachedHolidays[year] = fallback; renderHolidayList(fallback, true); }
-            else list.innerHTML = `<div style="text-align:center; padding:10px; color:#e74c3c; font-size:12px;">${i18n[currentLang].error}</div>`;
+            if (fallback) { cachedHolidays[year] = fallback; renderHolidayList(fallback); }
+            else list.innerHTML = `<div style="text-align:center; padding:10px; color:#e74c3c; font-size:12px;">API Error</div>`;
         }
     }
 
-    function renderHolidayList(hArr, isFallback = false) {
+    function renderHolidayList(hArr) {
         const list = document.getElementById('islamicHolidaysList');
-        const specialInputs = [
-            document.getElementById('spec1').value, 
-            document.getElementById('spec2').value, 
-            document.getElementById('spec3').value, 
-            document.getElementById('spec4').value
-        ];
-        
+        const specialInputs = [document.getElementById('spec1').value, document.getElementById('spec2').value, document.getElementById('spec3').value, document.getElementById('spec4').value];
         let combined = [...hArr.map(h => ({...h, type: 'religious'}))];
         specialInputs.forEach(sd => { if (sd && new Date(sd).getFullYear() === currentViewYear && !combined.some(h => h.d === sd)) combined.push({ id: 'user_date', d: sd, type: 'user' }); });
-        
         combined.sort((a, b) => new Date(a.d) - new Date(b.d));
-        if (!combined.length) { list.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-size:12px;">No major dates.</div>`; return; }
-
-        let html = isFallback ? `<div style="font-size:10px; color:#999; margin-bottom:10px; text-align:center;">${i18n[currentLang].error}</div>` : "";
+        let html = "";
         combined.forEach(h => {
-            const hDate = new Date(h.d), label = h.id === 'user_date' ? i18n[currentLang].userDate : i18n[currentLang][h.id];
-            const isAssigned = specialInputs.includes(h.d);
-            const cls = (h.type === 'user' || isAssigned) ? 'holiday-card user-date' : 'holiday-card';
-            
-            // Toggle Button Logic
-            let btn = '';
-            if (h.type === 'religious') {
-                btn = `<button class="toggle-spec-btn ${isAssigned ? 'remove-mode' : ''}" 
-                        onclick="toggleSpecialDate('${h.d}')" 
-                        title="${isAssigned ? 'Remove Highlight' : 'Highlight Date'}">
-                        ${isAssigned ? '−' : '+'}
-                      </button>`;
-            } else if (h.type === 'user') {
-                // For manual user entries, show the remove button always
-                btn = `<button class="toggle-spec-btn remove-mode" 
-                        onclick="toggleSpecialDate('${h.d}')" 
-                        title="Remove Highlight">−</button>`;
-            }
-
-            html += `<div class="${cls}"><div><div style="font-weight:700;">${label}</div><div class="holiday-date">${hDate.toLocaleDateString(currentLang==='ar'?'ar-EG':'en-US', {day:'numeric', month:'short'})}</div></div>${btn}</div>`;
+            const hDate = new Date(h.d), isAssigned = specialInputs.includes(h.d), cls = (h.type === 'user' || isAssigned) ? 'holiday-card user-date' : 'holiday-card';
+            let btn = `<button class="toggle-spec-btn ${isAssigned ? 'remove-mode' : ''}" onclick="toggleSpecialDate('${h.d}')">${isAssigned ? '−' : '+'}</button>`;
+            html += `<div class="${cls}"><div><div style="font-weight:700;">${i18n[currentLang][h.id] || i18n[currentLang].userDate}</div><div class="holiday-date">${hDate.toLocaleDateString(currentLang==='ar'?'ar-EG':'en-US', {day:'numeric', month:'short'})}</div></div>${btn}</div>`;
         });
         list.innerHTML = html;
     }
 
-    function generateShortPDF() { createPDF(true); }
-
-    function createPDF(isShort) {
-        const temp = document.createElement('div');
-        temp.style.width = '1000px'; temp.style.background = 'white'; temp.style.padding = '40px'; temp.style.fontFamily = 'Segoe UI, Arial, sans-serif';
-        const cOn = document.getElementById('colOn').value;
-        const cOff = document.getElementById('colOff').value;
-        const tOn = getContrastColor(cOn);
-        const tOff = getContrastColor(cOff);
-        
-        const title = document.createElement('h1'); title.style.textAlign = 'center'; title.style.marginBottom = '20px'; title.innerText = isShort ? "Shift Summary" : currentViewYear + " Calendar";
-        temp.appendChild(title);
-
-        const table = document.createElement('table'); table.style.width = '100%'; table.style.borderCollapse = 'collapse';
-        const startDayInput = new Date(document.getElementById('inStartDate').value);
-        let currentPdfDate = new Date(startDayInput);
+    // Helper for creating PDF Table Rows
+    function createPDFTable(rowsCount) {
+        const cOn = document.getElementById('colOn').value, cOff = document.getElementById('colOff').value, cSpec = document.getElementById('colSpec').value;
+        const tOn = getContrastColor(cOn), tOff = getContrastColor(cOff);
         const specials = [document.getElementById('spec1').value, document.getElementById('spec2').value, document.getElementById('spec3').value, document.getElementById('spec4').value];
+        const startDay = new Date(document.getElementById('inStartDate').value);
+        let curr = new Date(startDay);
 
-        for (let r = 0; r < (isShort ? 12 : 50); r++) {
+        const table = document.createElement('table'); table.style.width = '100%'; table.style.borderCollapse = 'collapse'; table.style.tableLayout = 'fixed';
+        
+        // Header
+        const thead = document.createElement('tr');
+        const days = i18n[currentLang].daysShort;
+        const startIdx = startDay.getDay();
+        for(let i=0; i<7; i++) {
+            const th = document.createElement('th'); th.innerText = days[(startIdx+i)%7]; 
+            th.style.border = '1px solid #ccc'; th.style.padding = '4px'; th.style.fontSize = '10px'; thead.appendChild(th);
+        }
+        table.appendChild(thead);
+
+        for (let r = 0; r < rowsCount; r++) { 
             const tr = document.createElement('tr');
             for (let c = 0; c < 7; c++) {
-                const td = document.createElement('td'); const iso = toISODate(currentPdfDate);
-                td.innerText = currentPdfDate.getDate() + '-' + currentPdfDate.toLocaleString('default',{month:'short'});
-                td.style.height = '40px'; td.style.textAlign = 'center'; td.style.border = '1px solid #ddd';
-                if (currentPdfDate.getDate() === 1) td.style.borderTop = '3px solid ' + cOn;
-                if (specials.includes(iso)) { td.style.backgroundColor = 'white'; td.style.color = 'red'; td.style.fontWeight = 'bold'; }
-                else if (globalOnDutySet.has(iso)) { td.style.backgroundColor = cOn; td.style.color = tOn; }
-                else { td.style.backgroundColor = cOff; td.style.color = tOff; }
-                tr.appendChild(td); currentPdfDate.setDate(currentPdfDate.getDate() + 1);
+                const td = document.createElement('td'); const iso = toISODate(curr);
+                let monthLabel = (currentLang === 'ar') ? arFullMonths[curr.getMonth()] : curr.toLocaleString('default',{month:'short'});
+                td.innerText = (currentLang === 'ar') ? "\u200E" + curr.getDate() + "\u00A0" + monthLabel : curr.getDate() + "-" + monthLabel;
+                
+                td.style.height = '34px'; td.style.textAlign = 'center'; td.style.border = '1px solid #ddd'; td.style.fontSize = '10px';
+                
+                // FIXED: Month-start indicator visibility logic for PDF
+                if (curr.getDate() === 1) {
+                    td.style.borderTop = '4px solid #000';
+                }
+
+                if (specials.includes(iso)) { 
+                    td.style.backgroundColor = cSpec; 
+                    td.style.color = getContrastColor(cSpec) === '#000000' ? 'red' : 'white'; 
+                    td.style.fontWeight='bold'; td.style.border='1.5px solid red';
+                }
+                else if (globalOnDutySet.has(iso)) { 
+                    td.style.backgroundColor = cOn; td.style.color = tOn; 
+                    if (curr.getDate() === 1) td.style.borderTop = '4px solid #fff'; // White border on dark cell
+                }
+                else { 
+                    td.style.backgroundColor = cOff; td.style.color = tOff; 
+                }
+                tr.appendChild(td); curr.setDate(curr.getDate() + 1);
             }
             table.appendChild(tr);
         }
-        temp.appendChild(table);
-        html2pdf().from(temp).save(isShort ? 'Summary.pdf' : 'Calendar.pdf');
+        return table;
+    }
+
+    function generateShortPDF() {
+        const temp = document.createElement('div');
+        temp.style.width = '680px'; temp.style.padding = '25px'; temp.style.background = 'white';
+        const title = document.createElement('h1'); title.style.textAlign = 'center'; title.style.marginBottom = '15px'; title.innerText = "Shift Summary " + currentViewYear;
+        temp.appendChild(title);
+        temp.appendChild(createPDFTable(18));
+        const opt = { margin: 0.1, filename: 'Shift_Summary.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(temp).save();
+    }
+
+    function generateFullYearPDF() {
+        const temp = document.createElement('div');
+        temp.style.width = '680px'; temp.style.padding = '25px'; temp.style.background = 'white';
+        const title = document.createElement('h1'); title.style.textAlign = 'center'; title.style.marginBottom = '15px'; title.innerText = "Full Year Calendar " + currentViewYear;
+        temp.appendChild(title);
+        temp.appendChild(createPDFTable(52)); // Enough rows for 1 year
+        const opt = { margin: 0.1, filename: 'Full_Year_Calendar.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(temp).save();
     }
 
     window.onload = init;
