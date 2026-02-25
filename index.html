@@ -109,16 +109,10 @@
             position: relative;
         }
 
-        /* High Contrast Month Start Indicators for Web View */
-        .month-start {
+        /* Fixed High Contrast Month Start Indicator (Always Black) */
+        #calTable .month-start {
             border-top: 5px solid #000 !important;
             font-weight: 900 !important;
-        }
-        .cell-on.month-start {
-            border-top: 5px solid #fff !important;
-        }
-        .cell-special.month-start {
-            border-top: 5px solid #000 !important;
         }
 
         .cell-off { background-color: var(--bg-off); color: var(--text-off); }
@@ -153,7 +147,7 @@
             font-size: 14px; background: #fafafa; text-align: center;
         }
 
-        /* Rotation List styling matching image look */
+        /* Rotation List styling */
         #logicTable { border-spacing: 0; width: 100%; }
         #logicTable thead tr { border-bottom: 1px solid #e0e0e0; }
         #logicTable th { font-weight: 700; color: #2c3e50; padding: 12px 4px; font-size: 13px; text-align: center; }
@@ -428,12 +422,16 @@
             
             const inputAttrs = `type="number" inputmode="numeric" pattern="[0-9]*" onfocus="this.select()"`;
             
+            // Format dates as DD/MM/YYYY in Rotation List
+            const fmtStart = `${currentStart.getDate()}/${currentStart.getMonth() + 1}/${currentStart.getFullYear()}`;
+            const fmtEnd = `${cycleEnd.getDate()}/${cycleEnd.getMonth() + 1}/${cycleEnd.getFullYear()}`;
+
             bodyHTML += `<tr>
                 <td>${i+1}</td>
-                <td>${currentStart.getMonth() + 1}/${currentStart.getDate()}/${currentStart.getFullYear()}</td>
+                <td>${fmtStart}</td>
                 <td><input ${inputAttrs} value="${rowsState[i].on}" onchange="updateTable(${i}, 'on', this.value)"></td>
                 <td><input ${inputAttrs} value="${rowsState[i].off}" onchange="updateTable(${i}, 'off', this.value)"></td>
-                <td>${cycleEnd.getMonth() + 1}/${cycleEnd.getDate()}/${cycleEnd.getFullYear()}</td>
+                <td>${fmtEnd}</td>
             </tr>`;
             currentStart = new Date(cycleEnd); currentStart.setDate(currentStart.getDate() + 1);
         }
@@ -499,7 +497,7 @@
             const cellDate = new Date(year, month, d), iso = toISODate(cellDate), td = document.createElement('td');
             td.innerText = d; 
             let cls = specials.includes(iso) ? "cell-special" : (globalOnDutySet.has(iso) ? "cell-on" : "cell-off");
-            if (d === 1) cls += " month-start";
+            // REMOVED: month-start class from mini-calendar cells in Year View
             td.className = cls; tr.appendChild(td);
         }
         while (tr.children.length > 0 && tr.children.length < 7) tr.appendChild(document.createElement('td'));
@@ -591,7 +589,7 @@
                 
                 td.style.height = '34px'; td.style.textAlign = 'center'; td.style.border = '1px solid #ddd'; td.style.fontSize = '10px';
                 
-                // FIXED: Month-start indicator visibility logic for PDF
+                // Month-start indicator visibility logic for PDF: Always Black
                 if (curr.getDate() === 1) {
                     td.style.borderTop = '4px solid #000';
                 }
@@ -603,7 +601,6 @@
                 }
                 else if (globalOnDutySet.has(iso)) { 
                     td.style.backgroundColor = cOn; td.style.color = tOn; 
-                    if (curr.getDate() === 1) td.style.borderTop = '4px solid #fff'; // White border on dark cell
                 }
                 else { 
                     td.style.backgroundColor = cOff; td.style.color = tOff; 
